@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using OpenTracing.Contrib.Grpc.OperationNameConstructor;
 
 namespace OpenTracing.Contrib.Grpc.Configuration
 {

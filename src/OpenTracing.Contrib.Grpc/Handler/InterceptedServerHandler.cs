@@ -51,8 +51,10 @@ namespace OpenTracing.Contrib.Grpc.Handler
 
         private ISpanBuilder GetSpanBuilderFromHeaders()
         {
+            var operationName = _configuration.OperationNameConstructor.ConstructOperationName(_context.Method);
+            var spanBuilder = _configuration.Tracer.BuildSpan(operationName);
+
             var parentSpanCtx = _configuration.Tracer.Extract(BuiltinFormats.HttpHeaders, new MetadataCarrier(_context.RequestHeaders));
-            var spanBuilder = _configuration.Tracer.BuildSpan(_context.Method); // TODO: grpc-csharp does not support operation name generation
             if (parentSpanCtx != null)
             {
                 spanBuilder = spanBuilder.AsChildOf(parentSpanCtx);

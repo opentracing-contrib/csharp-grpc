@@ -5,6 +5,7 @@ using OpenTracing.Contrib.Grpc.Configuration;
 using OpenTracing.Contrib.Grpc.Handler;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using OpenTracing.Contrib.Grpc.OperationNameConstructor;
 
 namespace OpenTracing.Contrib.Grpc.Interceptors
 {
@@ -50,7 +51,7 @@ namespace OpenTracing.Contrib.Grpc.Interceptors
         public class Builder
         {
             private readonly ITracer _tracer;
-            private IOperationNameConstructor _operationNameConstructor = null;
+            private IOperationNameConstructor _operationNameConstructor;
             private bool _streaming;
             private bool _verbose;
             private ISet<ServerTracingConfiguration.RequestAttribute> _tracedAttributes;
@@ -60,14 +61,13 @@ namespace OpenTracing.Contrib.Grpc.Interceptors
                 _tracer = tracer;
             }
 
-            // TODO: grpc-csharp does not support operation name generation
-            ///// <param name="operationNameConstructor">to name all spans created by this intercepter</param>
-            ///// <returns>this Builder with configured operation name</returns>
-            //public Builder WithOperationName(IOperationNameConstructor operationNameConstructor)
-            //{
-            //    _operationNameConstructor = operationNameConstructor;
-            //    return this;
-            //}
+            /// <param name="operationNameConstructor">to name all spans created by this intercepter</param>
+            /// <returns>this Builder with configured operation name</returns>
+            public Builder WithOperationName(IOperationNameConstructor operationNameConstructor)
+            {
+                _operationNameConstructor = operationNameConstructor;
+                return this;
+            }
 
             /// <summary>
             /// Logs streaming events to client spans.

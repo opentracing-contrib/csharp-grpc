@@ -4,6 +4,7 @@ using Grpc.Core.Utils;
 using OpenTracing.Contrib.Grpc.Configuration;
 using OpenTracing.Contrib.Grpc.Handler;
 using System.Collections.Generic;
+using OpenTracing.Contrib.Grpc.OperationNameConstructor;
 
 namespace OpenTracing.Contrib.Grpc.Interceptors
 {

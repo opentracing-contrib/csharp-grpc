@@ -1,4 +1,6 @@
-﻿namespace OpenTracing.Contrib.Grpc.Configuration
+﻿using OpenTracing.Contrib.Grpc.OperationNameConstructor;
+
+namespace OpenTracing.Contrib.Grpc.Configuration
 {
     public abstract class TracingConfiguration
     {

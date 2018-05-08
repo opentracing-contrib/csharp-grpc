@@ -73,6 +73,7 @@ using OpenTracing.Contrib.Grpc;
 
 A `ServerTracingInterceptor` uses default settings, which you can override by creating it using a `ServerTracingInterceptor.Builder`.
 
+- `WithOperationName(IOperationNameConstructor operationName)`: Define how the operation name is constructed for all spans created for this intercepted server. Default is the name of the RPC method. More details in the `Operation Name` section.
 - `WithStreaming()`: Logs to the server span whenever a message is received. *Note:* This package supports streaming but has not been rigorously tested. If you come across any issues, please let us know.
 - `WithVerbosity()`: Logs to the server span additional events, such as message received, headers received and call complete. Default only logs if a call is cancelled.
 - `WithTracedAttributes(params ServerRequestAttribute[] attrs)`: Sets tags on the server span in case you want to track information about the RPC call.
@@ -84,6 +85,7 @@ ServerTracingInterceptor tracingInterceptor = new ServerTracingInterceptor
     .Builder(tracer)
     .WithStreaming()
     .WithVerbosity()
+    .WithOperationName(new PrefixOperationNameConstructor("Server"))
     .WithTracedAttributes(ServerTracingConfiguration.RequestAttribute.Headers,
         ServerTracingConfiguration.RequestAttribute.MethodType)
     .Build();
@@ -132,24 +134,38 @@ This is useful if you want to manually set tags on the span, log important event
 
 The default operation name for any span is the RPC method name (`Grpc.Core.Method<TRequest, TResponse>.FullName`). However, you may want to add your own prefixes, alter the name, or define a new name. For examples of good operation names, check out the OpenTracing `semantics`.
 
-To alter the operation name, you need to add an implementation of the interface `IOperationNameConstructor` to the `ClientTracingInterceptor.Builder`. For example, if you want to add a prefix to the default operation name of your ClientInterceptor, your code would look like this:
+To alter the operation name, you need to add an implementation of the interface `IOperationNameConstructor` to the `ClientTracingInterceptor.Builder` or `ServerTracingInterceptor.Builder`. For example, if you want to add a prefix to the default operation name of your ClientInterceptor, your code would look like this:
 
 ```csharp
-public class PrefixOperationNameConstructor : IOperationNameConstructor
+public class CustomPrefixOperationNameConstructor : IOperationNameConstructor
 {
     public string ConstructOperationName<TRequest, TResponse>(Method<TRequest, TResponse> method)
     {
         return "your-prefix" + method.FullName;
     }
+    public string ConstructOperationName(string method)
+    {
+        return "your-prefix" + method;
+    }
 }
 
 ClientTracingInterceptor interceptor = ClientTracingInterceptor.Builder ...
-    .WithOperationName(new PrefixOperationNameConstructor())
+    .WithOperationName(new CustomPrefixOperationNameConstructor())
     .With....
     .Build()
 ```
 
-Due to how the C# version of GRPC interceptors are written, it's currently not possible to define a own implementation of `IOperationNameConstructor` for `ServerTracingInterceptor.Builder`.
+You can also use the default implementation using `PrefixOperationNameConstructor`:
+
+
+```csharp
+ClientTracingInterceptor interceptor = ClientTracingInterceptor.Builder ...
+    .WithOperationName(new PrefixOperationNameConstructor("your-prefix"))
+    .With....
+    .Build()
+```
+
+Due to how the C# version of GRPC interceptors are written, it's currently not possible get more information on the method than the method name in an `ServerTracingInterceptor`.
 
 ## Integrating with Other Interceptors
 GRPC provides `Intercept(Interceptor)` methods that allow you chaining multiple interceptors. Preferably put the tracing interceptor at the top of the interceptor stack so that it traces the entire request lifecycle, including other interceptors:
