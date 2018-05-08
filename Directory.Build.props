@@ -1,0 +1,19 @@
+<Project>
+  <PropertyGroup>
+    <VersionPrefix>0.1.0</VersionPrefix>
+    <Authors>Benjamin Krämer</Authors>
+    <PackageIconUrl>https://avatars0.githubusercontent.com/u/15482765</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/opentracing-contrib/csharp-grpc</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/opentracing-contrib/csharp-grpc/master/LICENSE</PackageLicenseUrl>
+    <PackageReleaseNotes>https://github.com/opentracing-contrib/csharp-grpc/releases</PackageReleaseNotes>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>git://github.com/opentracing-contrib/csharp-grpc</RepositoryUrl>
+
+    <!-- Projects that should generate nupkg files override this -->
+    <IsPackable>false</IsPackable>
+
+    <LangVersion>latest</LangVersion>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+</Project>
