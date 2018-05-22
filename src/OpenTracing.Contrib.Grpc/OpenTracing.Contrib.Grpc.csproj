@@ -9,8 +9,12 @@
 
   <ItemGroup>
     <!-- Main dependencies -->
-    <PackageReference Include="Grpc" Version="1.11.0" />
-    <PackageReference Include="OpenTracing" Version="0.11.0" />
+    <PackageReference Include="Grpc" Version="1.12.0" />
+    <PackageReference Include="OpenTracing" Version="0.12.0-rc1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="SourceLink.Create.GitHub" Version="2.8.1" />
   </ItemGroup>
 
 </Project>
