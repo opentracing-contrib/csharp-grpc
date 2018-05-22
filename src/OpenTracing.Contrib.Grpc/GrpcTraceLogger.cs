@@ -31,7 +31,7 @@ namespace OpenTracing.Contrib.Grpc
             _span.Log(new Dictionary<string, object>
             {
                 { LogFields.Event, "Response headers received" },
-                { "data", metadata.ToReadableString() } // TODO: .ToReadableString() not needed with jaeger-client-csharp v0.0.10
+                { "data", metadata }
             });
         }
 
@@ -42,7 +42,7 @@ namespace OpenTracing.Contrib.Grpc
             _span.Log(new Dictionary<string, object>
             {
                 { LogFields.Event, "gRPC request" },
-                { "data", req.ToString() } // TODO: .ToString() not needed with jaeger-client-csharp v0.0.10
+                { "data", req }
             });
         }
 
@@ -53,7 +53,7 @@ namespace OpenTracing.Contrib.Grpc
             _span.Log(new Dictionary<string, object>
             {
                 { LogFields.Event, "gRPC response" },
-                { "data", rsp.ToString() } // TODO: .ToString() not needed with jaeger-client-csharp v0.0.10
+                { "data", rsp }
             });
         }
 
