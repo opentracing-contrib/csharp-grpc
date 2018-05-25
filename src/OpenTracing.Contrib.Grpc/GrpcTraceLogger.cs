@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Grpc.Core;
 using OpenTracing.Contrib.Grpc.Configuration;
-using OpenTracing.Tag;
 
 namespace OpenTracing.Contrib.Grpc
 {

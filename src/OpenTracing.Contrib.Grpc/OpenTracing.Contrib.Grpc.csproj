@@ -9,8 +9,8 @@
 
   <ItemGroup>
     <!-- Main dependencies -->
-    <PackageReference Include="Grpc" Version="1.11.0" />
-    <PackageReference Include="OpenTracing" Version="0.11.0" />
+    <PackageReference Include="Grpc" Version="1.12.0" />
+    <PackageReference Include="OpenTracing" Version="0.12.0" />
   </ItemGroup>
 
 </Project>

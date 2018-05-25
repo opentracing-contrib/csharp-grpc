@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Grpc.Core;
 using Grpc.Core.Interceptors;
 using OpenTracing.Contrib.Grpc.Configuration;
-using OpenTracing.Contrib.Grpc.Interceptors;
 using OpenTracing.Contrib.Grpc.Propagation;
 using OpenTracing.Contrib.Grpc.Streaming;
 using OpenTracing.Propagation;
