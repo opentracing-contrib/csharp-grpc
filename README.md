@@ -1,3 +1,5 @@
+[![Build status][ci-img]][ci] [![NuGet][nuget-img]][nuget]
+
 **WARNING: This project is a work in progress and not yet ready for production**
 
 # OpenTracing gRPC Instrumentation
@@ -183,3 +185,8 @@ Server server = new Server
 ```csharp
 client = new SomeService.SomeServiceClient(this.channel.Intercept(someInterceptor).Intercept(someOtherInterceptor).Intercept(clientTracingInterceptor));
 ```
+
+[ci-img]: https://ci.appveyor.com/api/projects/status/github/opentracing-contrib/csharp-grpc?svg=true
+[ci]: https://ci.appveyor.com/project/opentracing/csharp-grpc
+[nuget-img]: https://img.shields.io/nuget/v/OpenTracing.Contrib.Grpc.svg
+[nuget]: https://www.nuget.org/packages/OpenTracing.Contrib.Grpc/
