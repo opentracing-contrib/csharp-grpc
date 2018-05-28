@@ -11,12 +11,15 @@ namespace OpenTracing.Contrib.Grpc
         public static ISpan SetException(this ISpan span, Exception ex)
         {
             return span?.SetTag(Tags.Error, true)
-                .Log(new Dictionary<string, object>(4)
+                .Log(new Dictionary<string, object>(5)
                 {
                     {LogFields.Event, Tags.Error.Key},
-                    {LogFields.ErrorKind, ex.GetType().Name},
                     {LogFields.ErrorObject, ex},
-                    {LogFields.Message, ex.Message}
+
+                    // Those fields will be removed once Configration.WithExpandExceptionLogs is implemented
+                    {LogFields.ErrorKind, ex.GetType().Name}, 
+                    {LogFields.Message, ex.Message},
+                    {LogFields.Stack, ex.StackTrace}
                 });
         }
 
