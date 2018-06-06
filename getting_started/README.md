@@ -54,14 +54,18 @@ It's easier to use the command line since we need to have two running instances.
 Add the following NuGet packages as dependencies to the shared `GreeterShared` project. This can be done through the .NET Core SDK using the following commands.
 
 ```bash
-> dotnet add GreeterShared package Microsoft.Extensions.Logging.Console
 > dotnet add GreeterShared package OpenTracing.Contrib.Grpc
 > dotnet add GreeterShared package Jaeger
+> dotnet add GreeterShared package Microsoft.Extensions.Logging.Console
 ```
+
+`OpenTracing.Contrib.Grpc` only relies on `OpenTracing` and no specific implementation. We will use `Jaeger` for our examples, but you are free to use whatever library fits your needs best.
+
+`Jaeger` internally uses the `Microsoft.Extensions.Logging` framework. We will add the console provider from `Microsoft.Extensions.Logging.Console` to show what's happening inside `Jaeger` on the command line.
 
 ## Get the tracer ready
 
-Create a new class `TracingHelper.cs` in the shared `GreeterShared` project. This will allow us to create an `OpenTracing.ITracer` instance implemented by `Jaeger.Tracer` class.
+Create a new class `TracingHelper.cs` in the shared `GreeterShared` project. This will allow us to create an `OpenTracing.ITracer` instance implemented by `Jaeger.Tracer`.
 
 ```csharp
 using Jaeger;
