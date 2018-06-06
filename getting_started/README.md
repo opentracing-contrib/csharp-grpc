@@ -12,7 +12,7 @@ Having followed the [gRPC Quickstart for C#](https://grpc.io/docs/quickstart/csh
 
 ## Installation
 
-The tutorial is using CNCF Jaeger (https://github.com/jaegertracing/jaeger) as the tracing backend, which uses [Docker](https://www.docker.com/get-docker). You will still be able to follow most of the tutorial, even without Docker. So don't worry if you can't or don't want to install it.
+The tutorial is using CNCF Jaeger (https://github.com/jaegertracing/jaeger) as the tracing backend, which be run from a [Docker](https://www.docker.com/get-docker) image. You will still be able to follow most of the tutorial, even without Docker. So don't worry if you can't or don't want to install it.
 
 For running the code, you will need the [.NET Core SDK](https://www.microsoft.com/net/download). The code can be written with any text editor and run from the command line.
 
@@ -49,7 +49,7 @@ It's easier to use the command line since we need to have two running instances.
 > dotnet run
 ```
 
-## Install NuGet packages
+## Install additional NuGet packages
 
 Add the following NuGet packages as dependencies to the shared `GreeterShared` project. This can be done through the .NET Core SDK using the following commands.
 
