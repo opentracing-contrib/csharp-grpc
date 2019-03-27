@@ -95,7 +95,7 @@ namespace OpenTracing.Contrib.Grpc.Interceptors
                 return this;
             }
 
-            /// <param name="tracedAttributes">to set as tags on client spans created by this intercepter</param>
+            /// <param name="tracedAttributes">to set as tags on client spans created by this interceptor</param>
             /// <returns>this Builder configured to trace attributes</returns>
             public Builder WithTracedAttributes(params ClientTracingConfiguration.RequestAttribute[] tracedAttributes)
             {

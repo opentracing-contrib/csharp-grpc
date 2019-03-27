@@ -35,5 +35,23 @@ namespace OpenTracing.Contrib.Grpc
 
             return string.Join(";", metadata.Select(e => $"{e.Key} = {e.Value}"));
         }
+
+        public static string ToReadableString(this CallOptions options)
+        {
+            // Should this be converted to milis?
+            var deadline = options.Deadline.HasValue ? options.Deadline.Value.ToUniversalTime().ToString() : "Infinite";
+            var headers = options.Headers.ToReadableString() ?? "Empty";
+            var writeOptions = options.WriteOptions == null ? "None" : options.WriteOptions.Flags.ToString();
+            var isContextPropagated = options.PropagationToken != null;
+
+            return $"Headers: {headers}; Deadline: {deadline}; IsWaitForReady: {options.IsWaitForReady}; WriteOptions: {writeOptions} IsContextPropagated: {isContextPropagated}";
+        }
+
+        public static string GetAuthorizationHeaderValue(this Metadata headers)
+        {
+            var authorization = headers?.FirstOrDefault(x => x.Key.Equals("authorization", StringComparison.OrdinalIgnoreCase))?.Value;
+
+            return string.IsNullOrWhiteSpace(authorization) ? "NoAuth" : authorization;
+        }
     }
 }
