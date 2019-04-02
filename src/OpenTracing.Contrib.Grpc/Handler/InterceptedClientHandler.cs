@@ -23,7 +23,7 @@ namespace OpenTracing.Contrib.Grpc.Handler
         {
             _configuration = configuration;
             _context = context;
-            if(context.Options.Headers == null)
+            if (context.Options.Headers == null)
             {
                 _context = new ClientInterceptorContext<TRequest, TResponse>(context.Method, context.Host,
                     context.Options.WithHeaders(new Metadata())); // Add empty metadata to options
@@ -42,9 +42,9 @@ namespace OpenTracing.Contrib.Grpc.Handler
                 .WithTag(Tags.Component, Constants.TAGS_COMPONENT)
                 .WithTag(Tags.SpanKind, Tags.SpanKindClient);
 
-            foreach(var attribute in _configuration.TracedAttributes)
+            foreach (var attribute in _configuration.TracedAttributes)
             {
-                switch(attribute)
+                switch (attribute)
                 {
                     case ClientTracingConfiguration.RequestAttribute.MethodType:
                         spanBuilder.WithTag(Constants.TAGS_GRPC_METHOD_TYPE, _context.Method?.Type.ToString());
@@ -56,11 +56,9 @@ namespace OpenTracing.Contrib.Grpc.Handler
                         spanBuilder.WithTag(Constants.TAGS_GRPC_DEADLINE_MILLIS, _context.Options.Deadline?.TimeRemaining().TotalMilliseconds.ToString(CultureInfo.InvariantCulture));
                         break;
                     case ClientTracingConfiguration.RequestAttribute.Authority:
-                        // TODO: Serialization is wrong
                         spanBuilder.WithTag(Constants.TAGS_GRPC_AUTHORITY, _context.Options.Headers.GetAuthorizationHeaderValue());
                         break;
                     case ClientTracingConfiguration.RequestAttribute.AllCallOptions:
-                        // TODO: Serialization is wrong
                         spanBuilder.WithTag(Constants.TAGS_GRPC_CALL_OPTIONS, _context.Options.ToReadableString());
                         break;
                     case ClientTracingConfiguration.RequestAttribute.Headers:
@@ -89,7 +87,7 @@ namespace OpenTracing.Contrib.Grpc.Handler
                 _logger.FinishSuccess();
                 return response;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.FinishException(ex);
                 throw;
@@ -109,7 +107,7 @@ namespace OpenTracing.Contrib.Grpc.Handler
                     _logger.FinishSuccess();
                     return response;
                 }
-                catch(AggregateException ex)
+                catch (AggregateException ex)
                 {
                     _logger.FinishException(ex.InnerException);
                     throw ex.InnerException;
@@ -141,7 +139,7 @@ namespace OpenTracing.Contrib.Grpc.Handler
                     _logger.FinishSuccess();
                     return response;
                 }
-                catch(AggregateException ex)
+                catch (AggregateException ex)
                 {
                     _logger.FinishException(ex.InnerException);
                     throw ex.InnerException;

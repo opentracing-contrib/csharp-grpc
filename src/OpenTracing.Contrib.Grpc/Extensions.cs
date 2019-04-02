@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Grpc.Core;
 using OpenTracing.Tag;
@@ -39,12 +40,16 @@ namespace OpenTracing.Contrib.Grpc
         public static string ToReadableString(this CallOptions options)
         {
             // Should this be converted to milis?
-            var deadline = options.Deadline.HasValue ? options.Deadline.Value.ToUniversalTime().ToString() : "Infinite";
+            var deadline = options.Deadline.HasValue ? options.Deadline.Value.ToUniversalTime().ToString(CultureInfo.InvariantCulture) : "Infinite";
             var headers = options.Headers.ToReadableString() ?? "Empty";
-            var writeOptions = options.WriteOptions == null ? "None" : options.WriteOptions.Flags.ToString();
+            var writeOptions = options.WriteOptions != null ? options.WriteOptions.Flags.ToString() : "None";
             var isContextPropagated = options.PropagationToken != null;
 
-            return $"Headers: {headers}; Deadline: {deadline}; IsWaitForReady: {options.IsWaitForReady}; WriteOptions: {writeOptions} IsContextPropagated: {isContextPropagated}";
+            return $"Headers: {headers}; " +
+                   $"Deadline: {deadline}; " +
+                   $"IsWaitForReady: {options.IsWaitForReady}; " +
+                   $"WriteOptions: {writeOptions} " +
+                   $"IsContextPropagated: {isContextPropagated}";
         }
 
         public static string GetAuthorizationHeaderValue(this Metadata headers)

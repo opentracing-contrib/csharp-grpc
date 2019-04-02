@@ -88,11 +88,12 @@ namespace OpenTracing.Contrib.Grpc.Test
                         .WithWriteOptions(new WriteOptions(WriteFlags.NoCompress));
 
                 var response5 = await client.GetNameAsync(
-                    new Person() { Name = "Test" },
+                    new Person { Name = "Test" },
                     options);
             }
             catch
             {
+                // Ignore
             }
 
             await server.ShutdownAsync();
