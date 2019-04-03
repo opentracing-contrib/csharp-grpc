@@ -1,16 +1,17 @@
-﻿using Grpc.Core;
-using Grpc.Core.Interceptors;
-using OpenTracing.Mock;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Grpc.Core;
+using Grpc.Core.Interceptors;
+using OpenTracing.Contrib.Grpc.Configuration;
 using OpenTracing.Contrib.Grpc.Interceptors;
+using OpenTracing.Mock;
 using Tutorial;
 
 namespace OpenTracing.Contrib.Grpc.Test
 {
-    class Program
+    internal class Program
     {
         private class ConsoleMockTracer : MockTracer
         {
@@ -20,8 +21,8 @@ namespace OpenTracing.Contrib.Grpc.Test
                 Console.WriteLine("Tags:");
                 Console.WriteLine(string.Join("; ", span.Tags.Select(e => $"{e.Key} = {e.Value}")));
                 Console.WriteLine("Logs:");
-                span.LogEntries.ForEach(entry => 
-                    Console.WriteLine($"Timestamp: {entry.Timestamp}, Fields: " 
+                span.LogEntries.ForEach(entry =>
+                    Console.WriteLine($"Timestamp: {entry.Timestamp}, Fields: "
                                       + string.Join("; ", entry.Fields.Select(e => $"{e.Key} = {e.Value}"))));
                 Console.WriteLine();
             }
@@ -29,9 +30,9 @@ namespace OpenTracing.Contrib.Grpc.Test
 
         private static readonly ServerTracingInterceptor ServerTracingInterceptor = new ServerTracingInterceptor(new ConsoleMockTracer());
 
-        static void Main()
+        private static Task Main()
         {
-            MainAsync().Wait();
+            return MainAsync();
         }
 
         private static async Task MainAsync()
@@ -42,7 +43,15 @@ namespace OpenTracing.Contrib.Grpc.Test
                 Services = { Phone.BindService(new PhoneImpl()).Intercept(ServerTracingInterceptor) }
             };
             server.Start();
-            var client = new Phone.PhoneClient(new Channel("localhost:8011", ChannelCredentials.Insecure).Intercept(ServerTracingInterceptor));
+
+            var tracingInterceptor = new ClientTracingInterceptor
+                .Builder(new ConsoleMockTracer())
+                .WithStreaming()
+                .WithVerbosity()
+                .WithTracedAttributes(ClientTracingConfiguration.RequestAttribute.AllCallOptions, ClientTracingConfiguration.RequestAttribute.Headers)
+                .Build();
+
+            var client = new Phone.PhoneClient(new Channel("localhost:8011", ChannelCredentials.Insecure).Intercept(tracingInterceptor));
             var request = new Person { Name = "Karl Heinz" };
             var response1 = await client.GetNameAsync(request);
 
@@ -71,16 +80,26 @@ namespace OpenTracing.Contrib.Grpc.Test
 
             try
             {
-                var response5 = await client.GetNameAsync(new Person());
+                var options =
+                    new CallOptions()
+                        .WithHeaders(new Metadata { { "CorrelationId", Guid.NewGuid().ToString() } })
+                        .WithDeadline(DateTime.UtcNow.AddHours(1))
+                        .WithWaitForReady(true)
+                        .WithWriteOptions(new WriteOptions(WriteFlags.NoCompress));
+
+                var response5 = await client.GetNameAsync(
+                    new Person { Name = "Test" },
+                    options);
             }
             catch
             {
+                // Ignore
             }
 
             await server.ShutdownAsync();
             Console.ReadLine();
         }
-        
+
         public class PhoneImpl : Phone.PhoneBase
         {
             public override Task<Person> GetName(Person request, ServerCallContext context)

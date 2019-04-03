@@ -41,7 +41,7 @@ namespace OpenTracing.Contrib.Grpc.Handler
                         spanBuilder.WithTag(Constants.TAGS_GRPC_METHOD_NAME, _context.Method);
                         break;
                     case ServerTracingConfiguration.RequestAttribute.Headers:
-                        // TODO: Check if this is always present immediately, expecially in case of streaming!
+                        // TODO: Check if this is always present immediately, especially in case of streaming!
                         spanBuilder.WithTag(Constants.TAGS_GRPC_HEADERS, _context.RequestHeaders?.ToReadableString());
                         break;
                 }

@@ -11,8 +11,8 @@ using OpenTracing.Tag;
 
 namespace OpenTracing.Contrib.Grpc.Handler
 {
-    internal class InterceptedClientHandler<TRequest, TResponse> 
-        where TRequest : class 
+    internal class InterceptedClientHandler<TRequest, TResponse>
+        where TRequest : class
         where TResponse : class
     {
         private readonly ClientTracingConfiguration _configuration;
@@ -25,7 +25,7 @@ namespace OpenTracing.Contrib.Grpc.Handler
             _context = context;
             if (context.Options.Headers == null)
             {
-                _context = new ClientInterceptorContext<TRequest, TResponse>(context.Method, context.Host, 
+                _context = new ClientInterceptorContext<TRequest, TResponse>(context.Method, context.Host,
                     context.Options.WithHeaders(new Metadata())); // Add empty metadata to options
             }
 
@@ -56,12 +56,10 @@ namespace OpenTracing.Contrib.Grpc.Handler
                         spanBuilder.WithTag(Constants.TAGS_GRPC_DEADLINE_MILLIS, _context.Options.Deadline?.TimeRemaining().TotalMilliseconds.ToString(CultureInfo.InvariantCulture));
                         break;
                     case ClientTracingConfiguration.RequestAttribute.Authority:
-                        // TODO: Serialization is wrong
-                        spanBuilder.WithTag(Constants.TAGS_GRPC_AUTHORITY, _context.Options.Credentials?.ToString());
+                        spanBuilder.WithTag(Constants.TAGS_GRPC_AUTHORITY, _context.Options.Headers.GetAuthorizationHeaderValue());
                         break;
                     case ClientTracingConfiguration.RequestAttribute.AllCallOptions:
-                        // TODO: Serialization is wrong
-                        spanBuilder.WithTag(Constants.TAGS_GRPC_CALL_OPTIONS, _context.Options.ToString());
+                        spanBuilder.WithTag(Constants.TAGS_GRPC_CALL_OPTIONS, _context.Options.ToReadableString());
                         break;
                     case ClientTracingConfiguration.RequestAttribute.Headers:
                         // TODO: Check if this is always present immediately, expecially in case of streaming!
