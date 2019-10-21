@@ -49,7 +49,7 @@
 
   <ItemGroup>
     <!-- Main dependencies -->
-    <PackageReference Include="Grpc" Version="1.12.0" />
+    <PackageReference Include="Grpc" Version="2.24.0" />
     <PackageReference Include="OpenTracing" Version="0.12.0" />
   </ItemGroup>
 
