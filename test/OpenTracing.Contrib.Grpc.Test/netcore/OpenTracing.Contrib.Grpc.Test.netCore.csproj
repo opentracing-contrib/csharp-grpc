@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <RootNamespace>OpenTracing.Contrib.Grpc.Test</RootNamespace>
+    <AssemblyName>OpenTracing.Contrib.Grpc.Test</AssemblyName>
+    <LangVersion>7.3</LangVersion>
+    <Version>0.2.0</Version>
+    <Authors>Benjamin Krämer, Medialogia®</Authors>
+    <PackageProjectUrl>https://github.com/Medialogia/csharp-grpc</PackageProjectUrl>
+    <RepositoryUrl>git://github.com/Medialogia/csharp-grpc</RepositoryUrl>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <OutputPath>bin</OutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath>bin</OutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\AddressbookGrpc.cs" Link="AddressbookGrpc.cs" />
+    <Compile Include="..\Program.cs" Link="Program.cs" />
+    <Compile Include="..\Tutorial\Addressbook.cs" Link="Tutorial\Addressbook.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Google.Protobuf" Version="3.5.1" />
+    <PackageReference Include="Grpc" Version="1.12.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Tutorial\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\OpenTracing.Contrib.Grpc\netcore\OpenTracing.Contrib.Grpc.netCore.csproj" />
+  </ItemGroup>
+
+</Project>

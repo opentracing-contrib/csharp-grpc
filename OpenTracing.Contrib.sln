@@ -13,15 +13,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{1C357E7A-E
 		test\Directory.Build.props = test\Directory.Build.props
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenTracing.Contrib.Grpc", "src\OpenTracing.Contrib.Grpc\OpenTracing.Contrib.Grpc.csproj", "{ADA91FF5-40F4-436E-90EC-1F20138DCCF8}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenTracing.Contrib.Grpc.Test", "test\OpenTracing.Contrib.Grpc.Test\OpenTracing.Contrib.Grpc.Test.csproj", "{7BE004FC-793E-4D39-8DAF-D0F9FD6E6205}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A47B38EB-246E-4CD5-9655-539466C71067}"
 	ProjectSection(SolutionItems) = preProject
 		Directory.Build.props = Directory.Build.props
 		README.md = README.md
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenTracing.Contrib.Grpc.Test.netCore", "test\OpenTracing.Contrib.Grpc.Test\netcore\OpenTracing.Contrib.Grpc.Test.netCore.csproj", "{B28314C8-123C-4F54-B338-57A27D9370C1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenTracing.Contrib.Grpc.netCore", "src\OpenTracing.Contrib.Grpc\netcore\OpenTracing.Contrib.Grpc.netCore.csproj", "{6D87A92C-96AE-4B48-9364-EB2922AE010C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenTracing.Contrib.Grpc.dotNet", "src\OpenTracing.Contrib.Grpc\dotnet\OpenTracing.Contrib.Grpc.dotNet.csproj", "{66F5D600-15EA-46AA-B693-78590AE0F7B1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenTracing.Contrib.Grpc.Test.dotNet", "test\OpenTracing.Contrib.Grpc.Test\dotnet\OpenTracing.Contrib.Grpc.Test.dotNet.csproj", "{F303E41E-D13E-4A01-A9CA-7AB96341229D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,21 +33,31 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{ADA91FF5-40F4-436E-90EC-1F20138DCCF8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{ADA91FF5-40F4-436E-90EC-1F20138DCCF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{ADA91FF5-40F4-436E-90EC-1F20138DCCF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{ADA91FF5-40F4-436E-90EC-1F20138DCCF8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7BE004FC-793E-4D39-8DAF-D0F9FD6E6205}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7BE004FC-793E-4D39-8DAF-D0F9FD6E6205}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7BE004FC-793E-4D39-8DAF-D0F9FD6E6205}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7BE004FC-793E-4D39-8DAF-D0F9FD6E6205}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B28314C8-123C-4F54-B338-57A27D9370C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B28314C8-123C-4F54-B338-57A27D9370C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B28314C8-123C-4F54-B338-57A27D9370C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B28314C8-123C-4F54-B338-57A27D9370C1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D87A92C-96AE-4B48-9364-EB2922AE010C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D87A92C-96AE-4B48-9364-EB2922AE010C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D87A92C-96AE-4B48-9364-EB2922AE010C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D87A92C-96AE-4B48-9364-EB2922AE010C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{66F5D600-15EA-46AA-B693-78590AE0F7B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66F5D600-15EA-46AA-B693-78590AE0F7B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66F5D600-15EA-46AA-B693-78590AE0F7B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66F5D600-15EA-46AA-B693-78590AE0F7B1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F303E41E-D13E-4A01-A9CA-7AB96341229D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F303E41E-D13E-4A01-A9CA-7AB96341229D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F303E41E-D13E-4A01-A9CA-7AB96341229D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F303E41E-D13E-4A01-A9CA-7AB96341229D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{ADA91FF5-40F4-436E-90EC-1F20138DCCF8} = {B72DE217-C3BF-4F75-9741-2B74E3847443}
-		{7BE004FC-793E-4D39-8DAF-D0F9FD6E6205} = {1C357E7A-E7A2-44DA-896E-C3E3FF24CF25}
+		{B28314C8-123C-4F54-B338-57A27D9370C1} = {1C357E7A-E7A2-44DA-896E-C3E3FF24CF25}
+		{6D87A92C-96AE-4B48-9364-EB2922AE010C} = {B72DE217-C3BF-4F75-9741-2B74E3847443}
+		{66F5D600-15EA-46AA-B693-78590AE0F7B1} = {B72DE217-C3BF-4F75-9741-2B74E3847443}
+		{F303E41E-D13E-4A01-A9CA-7AB96341229D} = {1C357E7A-E7A2-44DA-896E-C3E3FF24CF25}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {090F0273-DD20-4E48-91F3-DA8899862364}

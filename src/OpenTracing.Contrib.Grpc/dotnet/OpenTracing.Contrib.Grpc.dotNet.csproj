@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{66F5D600-15EA-46AA-B693-78590AE0F7B1}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>OpenTracing.Contrib.Grpc</RootNamespace>
+    <AssemblyName>OpenTracing.Contrib.Grpc</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\..\bin\net461\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\..\bin\net461\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\AssemblySharedInfo.cs">
+      <Link>AssemblySharedInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\Configuration\ClientTracingConfiguration.cs">
+      <Link>Configuration\ClientTracingConfiguration.cs</Link>
+    </Compile>
+    <Compile Include="..\Configuration\ServerTracingConfiguration.cs">
+      <Link>Configuration\ServerTracingConfiguration.cs</Link>
+    </Compile>
+    <Compile Include="..\Configuration\TracingConfiguration.cs">
+      <Link>Configuration\TracingConfiguration.cs</Link>
+    </Compile>
+    <Compile Include="..\Constants.cs">
+      <Link>Constants.cs</Link>
+    </Compile>
+    <Compile Include="..\Extensions.cs">
+      <Link>Extensions.cs</Link>
+    </Compile>
+    <Compile Include="..\GrpcTraceLogger.cs">
+      <Link>GrpcTraceLogger.cs</Link>
+    </Compile>
+    <Compile Include="..\Handler\InterceptedClientHandler.cs">
+      <Link>Handler\InterceptedClientHandler.cs</Link>
+    </Compile>
+    <Compile Include="..\Handler\InterceptedServerHandler.cs">
+      <Link>Handler\InterceptedServerHandler.cs</Link>
+    </Compile>
+    <Compile Include="..\Interceptors\ClientTracingInterceptor.cs">
+      <Link>Interceptors\ClientTracingInterceptor.cs</Link>
+    </Compile>
+    <Compile Include="..\Interceptors\ServerTracingInterceptor.cs">
+      <Link>Interceptors\ServerTracingInterceptor.cs</Link>
+    </Compile>
+    <Compile Include="..\OperationNameConstructor\DefaultOperationNameConstructor.cs">
+      <Link>OperationNameConstructor\DefaultOperationNameConstructor.cs</Link>
+    </Compile>
+    <Compile Include="..\OperationNameConstructor\IOperationNameConstructor.cs">
+      <Link>OperationNameConstructor\IOperationNameConstructor.cs</Link>
+    </Compile>
+    <Compile Include="..\OperationNameConstructor\PrefixOperationNameConstructor.cs">
+      <Link>OperationNameConstructor\PrefixOperationNameConstructor.cs</Link>
+    </Compile>
+    <Compile Include="..\Propagation\MetadataCarrier.cs">
+      <Link>Propagation\MetadataCarrier.cs</Link>
+    </Compile>
+    <Compile Include="..\Streaming\TracingAsyncStreamReader.cs">
+      <Link>Streaming\TracingAsyncStreamReader.cs</Link>
+    </Compile>
+    <Compile Include="..\Streaming\TracingClientStreamWriter.cs">
+      <Link>Streaming\TracingClientStreamWriter.cs</Link>
+    </Compile>
+    <Compile Include="..\Streaming\TracingServerStreamWriter.cs">
+      <Link>Streaming\TracingServerStreamWriter.cs</Link>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Grpc">
+      <Version>1.12.0</Version>
+    </PackageReference>
+    <PackageReference Include="OpenTracing">
+      <Version>0.12.0</Version>
+    </PackageReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

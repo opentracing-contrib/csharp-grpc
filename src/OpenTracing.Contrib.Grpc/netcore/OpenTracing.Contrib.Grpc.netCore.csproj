@@ -1,0 +1,65 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <IsPackable>true</IsPackable>
+    <Description>Adds OpenTracing instrumentation for .NET Core apps that use GRPC.</Description>
+    <PackageTags>opentracing;distributed-tracing;tracing;grpc;netcoreapp;dotnet</PackageTags>
+    <PackageId>OpenTracing.Contrib.Grpc</PackageId>
+    <Product>OpenTracing.Contrib.Grpc</Product>
+    <Authors>Benjamin Krämer, Medialogia®</Authors>
+    <AssemblyVersion>0.2.0.0</AssemblyVersion>
+    <FileVersion>0.2.0.0</FileVersion>
+    <PackageProjectUrl>https://github.com/Medialogia/csharp-grpc</PackageProjectUrl>
+    <RepositoryUrl>git://github.com/Medialogia/csharp-grpc</RepositoryUrl>
+    <Version>0.2.0</Version>
+    <AssemblyName>OpenTracing.Contrib.Grpc</AssemblyName>
+    <RootNamespace>OpenTracing.Contrib.Grpc</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile />
+    <OutputPath>..\..\..\bin</OutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile />
+    <OutputPath>..\..\..\bin</OutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Configuration\ClientTracingConfiguration.cs" Link="Configuration\ClientTracingConfiguration.cs" />
+    <Compile Include="..\Configuration\ServerTracingConfiguration.cs" Link="Configuration\ServerTracingConfiguration.cs" />
+    <Compile Include="..\Configuration\TracingConfiguration.cs" Link="Configuration\TracingConfiguration.cs" />
+    <Compile Include="..\Constants.cs" Link="Constants.cs" />
+    <Compile Include="..\Extensions.cs" Link="Extensions.cs" />
+    <Compile Include="..\GrpcTraceLogger.cs" Link="GrpcTraceLogger.cs" />
+    <Compile Include="..\Handler\InterceptedClientHandler.cs" Link="Handler\InterceptedClientHandler.cs" />
+    <Compile Include="..\Handler\InterceptedServerHandler.cs" Link="Handler\InterceptedServerHandler.cs" />
+    <Compile Include="..\Interceptors\ClientTracingInterceptor.cs" Link="Interceptors\ClientTracingInterceptor.cs" />
+    <Compile Include="..\Interceptors\ServerTracingInterceptor.cs" Link="Interceptors\ServerTracingInterceptor.cs" />
+    <Compile Include="..\OperationNameConstructor\DefaultOperationNameConstructor.cs" Link="OperationNameConstructor\DefaultOperationNameConstructor.cs" />
+    <Compile Include="..\OperationNameConstructor\IOperationNameConstructor.cs" Link="OperationNameConstructor\IOperationNameConstructor.cs" />
+    <Compile Include="..\OperationNameConstructor\PrefixOperationNameConstructor.cs" Link="OperationNameConstructor\PrefixOperationNameConstructor.cs" />
+    <Compile Include="..\Propagation\MetadataCarrier.cs" Link="Propagation\MetadataCarrier.cs" />
+    <Compile Include="..\Streaming\TracingAsyncStreamReader.cs" Link="Streaming\TracingAsyncStreamReader.cs" />
+    <Compile Include="..\Streaming\TracingClientStreamWriter.cs" Link="Streaming\TracingClientStreamWriter.cs" />
+    <Compile Include="..\Streaming\TracingServerStreamWriter.cs" Link="Streaming\TracingServerStreamWriter.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Main dependencies -->
+    <PackageReference Include="Grpc" Version="1.12.0" />
+    <PackageReference Include="OpenTracing" Version="0.12.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Configuration\" />
+    <Folder Include="Handler\" />
+    <Folder Include="Interceptors\" />
+    <Folder Include="OperationNameConstructor\" />
+    <Folder Include="Streaming\" />
+    <Folder Include="Propagation\" />
+  </ItemGroup>
+
+</Project>
