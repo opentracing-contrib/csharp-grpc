@@ -20,7 +20,6 @@ namespace OpenTracing.Contrib.Grpc.Streaming
             _onException = onException;
         }
 
-        public void Dispose() => _reader.Dispose();
         public T Current => _reader.Current;
 
         public async Task<bool> MoveNext(CancellationToken cancellationToken)
