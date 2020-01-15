@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net45;netcoreapp2.1;netcoreapp3.0</TargetFrameworks>
+    <TargetFrameworks>net45;netcoreapp2.1;netcoreapp3.1</TargetFrameworks>
     <RootNamespace>OpenTracing.Contrib.Grpc.Test</RootNamespace>
     <AssemblyName>OpenTracing.Contrib.Grpc.Test</AssemblyName>
     <LangVersion>7.3</LangVersion>
@@ -14,8 +14,8 @@
 
   <ItemGroup>
     <PackageReference Include="Google.Protobuf" Version="3.10.0" />
-    <PackageReference Include="Grpc.Tools" Version="2.24.0" PrivateAssets="all" />
-    <PackageReference Include="Grpc" Version="2.24.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.26.0" PrivateAssets="all" />
+    <PackageReference Include="Grpc" Version="2.26.0" />
   </ItemGroup>
 
   <ItemGroup>
