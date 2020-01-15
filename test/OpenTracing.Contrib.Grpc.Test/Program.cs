@@ -53,7 +53,7 @@ namespace OpenTracing.Contrib.Grpc.Test
 
             var client = new Phone.PhoneClient(new Channel("localhost:8011", ChannelCredentials.Insecure).Intercept(tracingInterceptor));
             var request = new Person { Name = "Karl Heinz" };
-            var response1 = await client.GetNameAsync(request);
+            var _ = await client.GetNameAsync(request);
 
             var response2 = client.GetNameRequestStream();
             await response2.RequestStream.WriteAsync(request);
