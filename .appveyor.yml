@@ -33,6 +33,6 @@ deploy:
     description: "See milestone for changes: https://github.com/opentracing-contrib/csharp-grpc/milestones"
     draft: true
     auth_token:
-      secure: VD2KNkqKnAIEm3QWxqCLC3KaVrQjfxsaV9NiuLCvrTEAk4p5ZmI462RA4qoB21KS
+      secure: 4zbtMttqfBfv1zsFBS6mUY+KHaACsFcvc+zVH0Y2BTI2w3ImAQhk7c4Fdet5OGG+
     on:
       appveyor_repo_tag: true
