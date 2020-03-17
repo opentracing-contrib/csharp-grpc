@@ -101,6 +101,8 @@ A `ClientTracingInterceptor` also has default settings, which you can override b
 - `WithStreaming()`: Logs to the client span whenever a message is sent or a response is received. *Note:* This package supports streaming but has not been rigorously tested. If you come across any issues, please let us know.
 - `WithVerbosity()`: Logs to the client span additional events, such as call started, message sent, headers received, response received, and call complete. Default only logs if a call is cancelled.
 - `WithTracedAttributes(params ClientRequestAttribute[] attrs)`: Sets tags on the client span in case you want to track information about the RPC call.
+- `WithWaitForReady()`: Enables WaitForReady on all RPC calls.
+- `WithFallbackCancellationToken(CancellationToken cancellationToken)`: Sets the cancellation token if RPC call hasn't defined one.
 
 ### Example
 ```csharp
@@ -119,6 +121,8 @@ ClientTracingInterceptor tracingInterceptor = new ClientTracingInterceptor
     .WithOperationName(new CustomOperationNameConstructor())
     .WithTracingAttributes(ClientTracingConfiguration.RequestAttribute.AllCallOptions,
         ClientTracingConfiguration.ClientRequestAttribute.Headers)
+    .WithWaitForReady()
+    .WithFallbackCancellationToken(cancellationToken)
     .Build();
 ```
 
