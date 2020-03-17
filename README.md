@@ -102,7 +102,7 @@ A `ClientTracingInterceptor` also has default settings, which you can override b
 - `WithVerbosity()`: Logs to the client span additional events, such as call started, message sent, headers received, response received, and call complete. Default only logs if a call is cancelled.
 - `WithTracedAttributes(params ClientRequestAttribute[] attrs)`: Sets tags on the client span in case you want to track information about the RPC call.
 - `WithWaitForReady()`: Enables WaitForReady on all RPC calls.
-- `WithFallbackCancellationToken(CancellationToken cancellationToken)`: Sets the cancellation token if RPC call hasn't defined one.
+- `WithFallbackCancellationToken(CancellationToken cancellationToken)`: Sets the cancellation token if the RPC call hasn't defined one.
 
 ### Example
 ```csharp
