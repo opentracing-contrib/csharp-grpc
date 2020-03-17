@@ -23,15 +23,37 @@ namespace OpenTracing.Contrib.Grpc.Handler
         {
             _configuration = configuration;
             _context = context;
-            if (context.Options.Headers == null)
+
+            var callOptions = ApplyConfigToCallOptions(_context.Options);
+            if (!Equals(callOptions, context.Options))
             {
-                _context = new ClientInterceptorContext<TRequest, TResponse>(context.Method, context.Host,
-                    context.Options.WithHeaders(new Metadata())); // Add empty metadata to options
+                _context = new ClientInterceptorContext<TRequest, TResponse>(context.Method, context.Host, callOptions);
             }
 
             var span = InitializeSpanWithHeaders();
             _logger = new GrpcTraceLogger<TRequest, TResponse>(span, configuration);
             _configuration.Tracer.Inject(span.Context, BuiltinFormats.HttpHeaders, new MetadataCarrier(_context.Options.Headers));
+        }
+
+        private CallOptions ApplyConfigToCallOptions(CallOptions callOptions)
+        {
+            if (callOptions.Headers == null)
+            {
+                // Add empty metadata to options:
+                callOptions = callOptions.WithHeaders(new Metadata());
+            }
+
+            if (_configuration.WaitForReady && callOptions.IsWaitForReady != _configuration.WaitForReady)
+            {
+                callOptions = callOptions.WithWaitForReady();
+            }
+
+            if (_configuration.FallbackCancellationToken != default && callOptions.CancellationToken != _configuration.FallbackCancellationToken)
+            {
+                callOptions = callOptions.WithCancellationToken(_configuration.FallbackCancellationToken);
+            }
+
+            return callOptions;
         }
 
         private ISpan InitializeSpanWithHeaders()

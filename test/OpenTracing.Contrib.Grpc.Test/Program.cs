@@ -49,6 +49,7 @@ namespace OpenTracing.Contrib.Grpc.Test
                 .WithStreaming()
                 .WithVerbosity()
                 .WithTracedAttributes(ClientTracingConfiguration.RequestAttribute.AllCallOptions, ClientTracingConfiguration.RequestAttribute.Headers)
+                .WithWaitForReady()
                 .Build();
 
             var client = new Phone.PhoneClient(new Channel("localhost:8011", ChannelCredentials.Insecure).Intercept(tracingInterceptor));

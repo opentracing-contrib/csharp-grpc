@@ -20,7 +20,7 @@ namespace OpenTracing.Contrib.Grpc.Configuration
             TracedAttributes = new HashSet<RequestAttribute>();
         }
 
-        internal ServerTracingConfiguration(ITracer tracer, IOperationNameConstructor operationNameConstructor, bool streaming, bool verbose, ISet<RequestAttribute> tracedAttributes) 
+        internal ServerTracingConfiguration(ITracer tracer, IOperationNameConstructor operationNameConstructor, bool streaming, bool verbose, ISet<RequestAttribute> tracedAttributes)
             : base(tracer, operationNameConstructor, streaming, verbose)
         {
             TracedAttributes = tracedAttributes ?? new HashSet<RequestAttribute>();

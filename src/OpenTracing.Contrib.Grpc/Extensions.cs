@@ -18,7 +18,7 @@ namespace OpenTracing.Contrib.Grpc
                     {LogFields.ErrorObject, ex},
 
                     // Those fields will be removed once Configration.WithExpandExceptionLogs is implemented
-                    {LogFields.ErrorKind, ex.GetType().Name}, 
+                    {LogFields.ErrorKind, ex.GetType().Name},
                     {LogFields.Message, ex.Message},
                     {LogFields.Stack, ex.StackTrace}
                 });

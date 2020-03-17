@@ -4,6 +4,7 @@ using Grpc.Core.Utils;
 using OpenTracing.Contrib.Grpc.Configuration;
 using OpenTracing.Contrib.Grpc.Handler;
 using System.Collections.Generic;
+using System.Threading;
 using OpenTracing.Contrib.Grpc.OperationNameConstructor;
 
 namespace OpenTracing.Contrib.Grpc.Interceptors
@@ -61,6 +62,8 @@ namespace OpenTracing.Contrib.Grpc.Interceptors
             private bool _streaming;
             private bool _verbose;
             private ISet<ClientTracingConfiguration.RequestAttribute> _tracedAttributes;
+            private bool _waitForReady;
+            private CancellationToken _cancellationToken;
 
             public Builder(ITracer tracer)
             {
@@ -103,9 +106,27 @@ namespace OpenTracing.Contrib.Grpc.Interceptors
                 return this;
             }
 
+            /// <summary>
+            /// Enables WaitForReady call option for all calls.
+            /// </summary>
+            /// <returns>this Builder configured to be verbose</returns>
+            public Builder WithWaitForReady()
+            {
+                _waitForReady = true;
+                return this;
+            }
+
+            /// <param name="cancellationToken">The cancellation token to set for all RPCs if none was set.</param>
+            /// <returns>this Builder configured to be verbose</returns>
+            public Builder WithFallbackCancellationToken(CancellationToken cancellationToken)
+            {
+                _cancellationToken = cancellationToken;
+                return this;
+            }
+
             public ClientTracingInterceptor Build()
             {
-                var configuration = new ClientTracingConfiguration(_tracer, _operationNameConstructor, _streaming, _verbose, _tracedAttributes);
+                var configuration = new ClientTracingConfiguration(_tracer, _operationNameConstructor, _streaming, _verbose, _tracedAttributes, _waitForReady, _cancellationToken);
                 return new ClientTracingInterceptor(configuration);
             }
         }
