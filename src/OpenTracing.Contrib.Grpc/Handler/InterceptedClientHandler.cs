@@ -23,10 +23,25 @@ namespace OpenTracing.Contrib.Grpc.Handler
         {
             _configuration = configuration;
             _context = context;
+
+            var callOptions = context.Options;
             if (context.Options.Headers == null)
             {
-                _context = new ClientInterceptorContext<TRequest, TResponse>(context.Method, context.Host,
-                    context.Options.WithHeaders(new Metadata())); // Add empty metadata to options
+                // Add empty metadata to options:
+                callOptions = callOptions.WithHeaders(new Metadata());
+            }
+            if (configuration.WaitForReady && context.Options.IsWaitForReady != configuration.WaitForReady)
+            {
+                callOptions = callOptions.WithWaitForReady();
+            }
+            if (configuration.FallbackCancellationToken != default && context.Options.CancellationToken != configuration.FallbackCancellationToken)
+            {
+                callOptions = callOptions.WithCancellationToken(configuration.FallbackCancellationToken);
+            }
+
+            if (!Equals(callOptions, context.Options))
+            {
+                _context = new ClientInterceptorContext<TRequest, TResponse>(context.Method, context.Host, callOptions);
             }
 
             var span = InitializeSpanWithHeaders();

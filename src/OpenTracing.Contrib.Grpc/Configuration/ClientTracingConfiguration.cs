@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using OpenTracing.Contrib.Grpc.OperationNameConstructor;
 
 namespace OpenTracing.Contrib.Grpc.Configuration
@@ -17,16 +18,20 @@ namespace OpenTracing.Contrib.Grpc.Configuration
         }
 
         public ISet<RequestAttribute> TracedAttributes { get; }
+        public bool WaitForReady { get; }
+        public CancellationToken FallbackCancellationToken { get; }
 
         internal ClientTracingConfiguration(ITracer tracer) : base(tracer)
         {
             TracedAttributes = new HashSet<RequestAttribute>();
         }
 
-        internal ClientTracingConfiguration(ITracer tracer, IOperationNameConstructor operationNameConstructor, bool streaming, bool verbose, ISet<RequestAttribute> tracedAttributes) 
+        internal ClientTracingConfiguration(ITracer tracer, IOperationNameConstructor operationNameConstructor, bool streaming, bool verbose, ISet<RequestAttribute> tracedAttributes, bool waitForReady, CancellationToken fallbackCancellationToken)
             : base(tracer, operationNameConstructor, streaming, verbose)
         {
             TracedAttributes = tracedAttributes ?? new HashSet<RequestAttribute>();
+            WaitForReady = waitForReady;
+            FallbackCancellationToken = fallbackCancellationToken;
         }
     }
 }

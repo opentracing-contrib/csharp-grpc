@@ -5,8 +5,8 @@ using OpenTracing.Contrib.Grpc.Configuration;
 
 namespace OpenTracing.Contrib.Grpc
 {
-    internal class GrpcTraceLogger<TRequest, TResponse> 
-        where TRequest : class 
+    internal class GrpcTraceLogger<TRequest, TResponse>
+        where TRequest : class
         where TResponse : class
     {
         private readonly ISpan _span;
