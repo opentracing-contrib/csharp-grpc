@@ -2,7 +2,7 @@
   <Import Project="version.props" />
   <PropertyGroup>
     <Authors>Benjamin Krämer</Authors>
-    <PackageIcon>$(Solutiondir)/icon.png</PackageIcon>
+    <PackageIcon>icon.png</PackageIcon>
     <PackageProjectUrl>https://github.com/opentracing-contrib/csharp-grpc</PackageProjectUrl>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageReleaseNotes Condition="'$(Version)' != ''">https://github.com/opentracing-contrib/csharp-grpc/releases/tag/v$(Version)</PackageReleaseNotes>
@@ -15,4 +15,7 @@
     <LangVersion>latest</LangVersion>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
+  <ItemGroup>
+    <None Include="$(Solutiondir)/icon.png" Pack="true" PackagePath=""/>
+  </ItemGroup>
 </Project>
