@@ -60,6 +60,7 @@ namespace OpenTracing.Contrib.Grpc.Interceptors
             private readonly ITracer _tracer;
             private IOperationNameConstructor _operationNameConstructor;
             private bool _streaming;
+            private bool _streamingInputSpans;
             private bool _verbose;
             private ISet<ClientTracingConfiguration.RequestAttribute> _tracedAttributes;
             private bool _waitForReady;
@@ -85,6 +86,16 @@ namespace OpenTracing.Contrib.Grpc.Interceptors
             public Builder WithStreaming()
             {
                 _streaming = true;
+                return this;
+            }
+
+            /// <summary>
+            /// Creates a child span for each input message received.
+            /// </summary>
+            /// <returns>this Builder configured to create child spans</returns>
+            public Builder WithStreamingInputSpans()
+            {
+                _streamingInputSpans = true;
                 return this;
             }
 
@@ -126,7 +137,7 @@ namespace OpenTracing.Contrib.Grpc.Interceptors
 
             public ClientTracingInterceptor Build()
             {
-                var configuration = new ClientTracingConfiguration(_tracer, _operationNameConstructor, _streaming, _verbose, _tracedAttributes, _waitForReady, _cancellationToken);
+                var configuration = new ClientTracingConfiguration(_tracer, _operationNameConstructor, _streaming, _streamingInputSpans, _verbose, _tracedAttributes, _waitForReady, _cancellationToken);
                 return new ClientTracingInterceptor(configuration);
             }
         }

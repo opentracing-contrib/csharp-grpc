@@ -76,7 +76,8 @@ using OpenTracing.Contrib.Grpc;
 A `ServerTracingInterceptor` uses default settings, which you can override by creating it using a `ServerTracingInterceptor.Builder`.
 
 - `WithOperationName(IOperationNameConstructor operationName)`: Define how the operation name is constructed for all spans created for this intercepted server. Default is the name of the RPC method. More details in the `Operation Name` section.
-- `WithStreaming()`: Logs to the server span whenever a message is received. *Note:* This package supports streaming but has not been rigorously tested. If you come across any issues, please let us know.
+- `WithStreaming()`: Logs to the server span whenever a message is is received or a response sent. *Note:* This package supports streaming but has not been rigorously tested. If you come across any issues, please let us know.
+- `WithStreamingInputSpans()`: Creates a child span for each incoming message. This is adviced when using long-running streams as the calls span is only finished when the connection is closed.
 - `WithVerbosity()`: Logs to the server span additional events, such as message received, headers received and call complete. Default only logs if a call is cancelled.
 - `WithTracedAttributes(params ServerRequestAttribute[] attrs)`: Sets tags on the server span in case you want to track information about the RPC call.
 
@@ -86,6 +87,7 @@ A `ServerTracingInterceptor` uses default settings, which you can override by cr
 ServerTracingInterceptor tracingInterceptor = new ServerTracingInterceptor
     .Builder(tracer)
     .WithStreaming()
+    .WithStreamingInputSpans()
     .WithVerbosity()
     .WithOperationName(new PrefixOperationNameConstructor("Server"))
     .WithTracedAttributes(ServerTracingConfiguration.RequestAttribute.Headers,
@@ -99,6 +101,7 @@ A `ClientTracingInterceptor` also has default settings, which you can override b
 
 - `WithOperationName(IOperationNameConstructor operationName)`: Define how the operation name is constructed for all spans created for this intercepted client. Default is the name of the RPC method. More details in the `Operation Name` section.
 - `WithStreaming()`: Logs to the client span whenever a message is sent or a response is received. *Note:* This package supports streaming but has not been rigorously tested. If you come across any issues, please let us know.
+- `WithStreamingInputSpans()`: Creates a child span for each incoming message. This is adviced when using long-running streams as the calls span is only finished when the connection is closed.
 - `WithVerbosity()`: Logs to the client span additional events, such as call started, message sent, headers received, response received, and call complete. Default only logs if a call is cancelled.
 - `WithTracedAttributes(params ClientRequestAttribute[] attrs)`: Sets tags on the client span in case you want to track information about the RPC call.
 - `WithWaitForReady()`: Enables WaitForReady on all RPC calls.
@@ -117,6 +120,7 @@ public class CustomOperationNameConstructor : IOperationNameConstructor
 ClientTracingInterceptor tracingInterceptor = new ClientTracingInterceptor
     .Builder(tracer)
     .WithStreaming()
+    .WithStreamingInputSpans()
     .WithVerbosity()
     .WithOperationName(new CustomOperationNameConstructor())
     .WithTracingAttributes(ClientTracingConfiguration.RequestAttribute.AllCallOptions,
