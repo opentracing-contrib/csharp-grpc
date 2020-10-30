@@ -12,6 +12,11 @@ namespace OpenTracing.Contrib.Grpc
         private readonly ISpan _span;
         private readonly TracingConfiguration _configuration;
 
+        private IScope _scope;
+        private bool _isFinished;
+
+        private ISpan ScopeSpan => _scope?.Span ?? _span;
+
         public GrpcTraceLogger(ISpan span, TracingConfiguration configuration)
         {
             _span = span;
@@ -34,11 +39,27 @@ namespace OpenTracing.Contrib.Grpc
             });
         }
 
+        public void BeginScope(string operationName)
+        {
+            if (!(_configuration.StreamingInputSpans || _configuration.Verbose)) return;
+
+            _scope = _configuration.Tracer.BuildSpan(operationName).StartActive(false);
+        }
+
+        public void EndScope()
+        {
+            if (_scope == null || !(_configuration.StreamingInputSpans || _configuration.Verbose)) return;
+
+            _scope.Span.Finish();
+            _scope.Dispose();
+            _scope = null;
+        }
+
         public void Request(TRequest req)
         {
             if (!(_configuration.Streaming || _configuration.Verbose)) return;
 
-            _span.Log(new Dictionary<string, object>
+            ScopeSpan.Log(new Dictionary<string, object>
             {
                 { LogFields.Event, "gRPC request" },
                 { "data", req }
@@ -49,7 +70,7 @@ namespace OpenTracing.Contrib.Grpc
         {
             if (!(_configuration.Streaming || _configuration.Verbose)) return;
 
-            _span.Log(new Dictionary<string, object>
+            ScopeSpan.Log(new Dictionary<string, object>
             {
                 { LogFields.Event, "gRPC response" },
                 { "data", rsp }
@@ -62,7 +83,7 @@ namespace OpenTracing.Contrib.Grpc
             {
                 _span.Log("Call completed");
             }
-            _span.Finish();
+            Finish();
         }
 
         public void FinishException(Exception ex)
@@ -71,8 +92,17 @@ namespace OpenTracing.Contrib.Grpc
             {
                 _span.Log("Call failed");
             }
-            _span.SetException(ex)
-                .Finish();
+            _span.SetException(ex);
+            Finish();
+        }
+
+        private void Finish()
+        {
+            if (_isFinished) return;
+
+            EndScope();
+            _span.Finish();
+            _isFinished = true;
         }
     }
 }

@@ -53,6 +53,7 @@ namespace OpenTracing.Contrib.Grpc.Interceptors
             private readonly ITracer _tracer;
             private IOperationNameConstructor _operationNameConstructor;
             private bool _streaming;
+            private bool _streamingInputSpans;
             private bool _verbose;
             private ISet<ServerTracingConfiguration.RequestAttribute> _tracedAttributes;
 
@@ -70,7 +71,7 @@ namespace OpenTracing.Contrib.Grpc.Interceptors
             }
 
             /// <summary>
-            /// Logs streaming events to client spans.
+            /// Logs streaming events to server spans.
             /// </summary>
             /// <returns>this Builder configured to log streaming events</returns>
             public Builder WithStreaming()
@@ -80,7 +81,17 @@ namespace OpenTracing.Contrib.Grpc.Interceptors
             }
 
             /// <summary>
-            /// Logs all request life-cycle events to client spans.
+            /// Creates a child span for each input message received.
+            /// </summary>
+            /// <returns>this Builder configured to create child spans</returns>
+            public Builder WithStreamingInputSpans()
+            {
+                _streamingInputSpans = true;
+                return this;
+            }
+
+            /// <summary>
+            /// Logs all request life-cycle events to server spans.
             /// </summary>
             /// <returns>this Builder configured to be verbose</returns>
             public Builder WithVerbosity()
@@ -89,7 +100,7 @@ namespace OpenTracing.Contrib.Grpc.Interceptors
                 return this;
             }
 
-            /// <param name="tracedAttributes">to set as tags on client spans created by this intercepter</param>
+            /// <param name="tracedAttributes">to set as tags on server spans created by this intercepter</param>
             /// <returns>this Builder configured to trace attributes</returns>
             public Builder WithTracedAttributes(params ServerTracingConfiguration.RequestAttribute[] tracedAttributes)
             {
@@ -99,7 +110,7 @@ namespace OpenTracing.Contrib.Grpc.Interceptors
 
             public ServerTracingInterceptor Build()
             {
-                var configuration = new ServerTracingConfiguration(_tracer, _operationNameConstructor, _streaming, _verbose, _tracedAttributes);
+                var configuration = new ServerTracingConfiguration(_tracer, _operationNameConstructor, _streaming, _streamingInputSpans, _verbose, _tracedAttributes);
                 return new ServerTracingInterceptor(configuration);
             }
         }

@@ -16,6 +16,7 @@ namespace OpenTracing.Contrib.Grpc.Handler
         private readonly ServerTracingConfiguration _configuration;
         private readonly ServerCallContext _context;
         private readonly GrpcTraceLogger<TRequest, TResponse> _logger;
+        private readonly TracingAsyncStreamReader<TRequest>.StreamActions _streamActions;
 
         public InterceptedServerHandler(ServerTracingConfiguration configuration, ServerCallContext context)
         {
@@ -24,6 +25,9 @@ namespace OpenTracing.Contrib.Grpc.Handler
 
             var span = GetSpanFromContext();
             _logger = new GrpcTraceLogger<TRequest, TResponse>(span, configuration);
+
+            var scopeActions = new ScopeActions("new_request", _logger.BeginScope, _logger.EndScope);
+            _streamActions = new TracingAsyncStreamReader<TRequest>.StreamActions(scopeActions, _logger.Request);
         }
 
         private ISpan GetSpanFromContext()
@@ -83,7 +87,7 @@ namespace OpenTracing.Contrib.Grpc.Handler
         {
             try
             {
-                var tracingRequestStream = new TracingAsyncStreamReader<TRequest>(requestStream, _logger.Request);
+                var tracingRequestStream = new TracingAsyncStreamReader<TRequest>(requestStream, _streamActions);
                 var response = await continuation(tracingRequestStream, _context).ConfigureAwait(false);
                 _logger.Response(response);
                 _logger.FinishSuccess();
@@ -116,7 +120,7 @@ namespace OpenTracing.Contrib.Grpc.Handler
         {
             try
             {
-                var tracingRequestStream = new TracingAsyncStreamReader<TRequest>(requestStream, _logger.Request);
+                var tracingRequestStream = new TracingAsyncStreamReader<TRequest>(requestStream, _streamActions);
                 var tracingResponseStream = new TracingServerStreamWriter<TResponse>(responseStream, _logger.Response);
                 await continuation(tracingRequestStream, tracingResponseStream, _context).ConfigureAwait(false);
                 _logger.FinishSuccess();

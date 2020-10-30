@@ -5,42 +5,41 @@ using Grpc.Core;
 
 namespace OpenTracing.Contrib.Grpc.Streaming
 {
-    internal class TracingAsyncStreamReader<T> : IAsyncStreamReader<T>
+    internal partial class TracingAsyncStreamReader<T> : IAsyncStreamReader<T>
     {
         private readonly IAsyncStreamReader<T> _reader;
-        private readonly Action<T> _onMessage;
-        private readonly Action _onStreamEnd;
-        private readonly Action<Exception> _onException;
-
-        public TracingAsyncStreamReader(IAsyncStreamReader<T> reader, Action<T> onMessage, Action onStreamEnd = null, Action<Exception> onException = null)
-        {
-            _reader = reader;
-            _onMessage = onMessage;
-            _onStreamEnd = onStreamEnd;
-            _onException = onException;
-        }
+        private readonly StreamActions _streamActions;
 
         public T Current => _reader.Current;
+
+        public TracingAsyncStreamReader(IAsyncStreamReader<T> reader, StreamActions streamActions)
+        {
+            _reader = reader;
+            _streamActions = streamActions;
+        }
 
         public async Task<bool> MoveNext(CancellationToken cancellationToken)
         {
             try
             {
+                _streamActions.ScopeActions.EndScope();
+
                 var hasNext = await _reader.MoveNext(cancellationToken).ConfigureAwait(false);
                 if (hasNext)
                 {
-                    _onMessage?.Invoke(Current);
+                    _streamActions.ScopeActions.BeginScope();
+                    _streamActions.Message(Current);
                 }
                 else
                 {
-                    _onStreamEnd?.Invoke();
+                    _streamActions.StreamEnd();
                 }
 
                 return hasNext;
             }
             catch (Exception ex)
             {
-                _onException?.Invoke(ex);
+                _streamActions.Exception(ex);
                 throw;
             }
         }
