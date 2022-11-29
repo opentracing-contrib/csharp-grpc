@@ -39,16 +39,46 @@ namespace OpenTracing.Contrib.Grpc
             });
         }
 
-        public void BeginScope(string operationName)
+        public void BeginInputScope(string operationName)
         {
             if (!(_configuration.StreamingInputSpans || _configuration.Verbose)) return;
 
-            _scope = _configuration.Tracer.BuildSpan(operationName).StartActive(false);
+            BeginScope(operationName);
         }
 
-        public void EndScope()
+        public void BeginOutputScope(string operationName)
         {
-            if (_scope == null || !(_configuration.StreamingInputSpans || _configuration.Verbose)) return;
+            if (!(_configuration.StreamingOutputSpans || _configuration.Verbose)) return;
+
+            BeginScope(operationName);
+        }
+
+        private void BeginScope(string operationName)
+        {
+            if (_scope != null) EndScope();
+
+            _scope = _configuration.Tracer.BuildSpan(operationName)
+                .AsChildOf(_span.Context)
+                .StartActive(false);
+        }
+
+        public void EndInputScope()
+        {
+            if (!(_configuration.StreamingInputSpans || _configuration.Verbose)) return;
+
+            EndScope();
+        }
+
+        public void EndOutputScope()
+        {
+            if (!(_configuration.StreamingOutputSpans || _configuration.Verbose)) return;
+
+            EndScope();
+        }
+
+        private void EndScope()
+        {
+            if (_scope == null) return;
 
             _scope.Span.Finish();
             _scope.Dispose();

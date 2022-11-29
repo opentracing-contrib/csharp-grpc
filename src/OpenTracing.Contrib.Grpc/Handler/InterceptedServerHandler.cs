@@ -16,7 +16,8 @@ namespace OpenTracing.Contrib.Grpc.Handler
         private readonly ServerTracingConfiguration _configuration;
         private readonly ServerCallContext _context;
         private readonly GrpcTraceLogger<TRequest, TResponse> _logger;
-        private readonly TracingAsyncStreamReader<TRequest>.StreamActions _streamActions;
+        private readonly StreamActions<TRequest> _inputStreamActions;
+        private readonly StreamActions<TResponse> _outputStreamActions;
 
         public InterceptedServerHandler(ServerTracingConfiguration configuration, ServerCallContext context)
         {
@@ -26,8 +27,11 @@ namespace OpenTracing.Contrib.Grpc.Handler
             var span = GetSpanFromContext();
             _logger = new GrpcTraceLogger<TRequest, TResponse>(span, configuration);
 
-            var scopeActions = new ScopeActions("new_request", _logger.BeginScope, _logger.EndScope);
-            _streamActions = new TracingAsyncStreamReader<TRequest>.StreamActions(scopeActions, _logger.Request);
+            var inputScopeActions = new ScopeActions("new_request", _logger.BeginInputScope, _logger.EndInputScope);
+            _inputStreamActions = new StreamActions<TRequest>(inputScopeActions, _logger.Request);
+
+            var outputScopeActions = new ScopeActions("new_response", _logger.BeginOutputScope, _logger.EndOutputScope);
+            _outputStreamActions = new StreamActions<TResponse>(outputScopeActions, _logger.Response);
         }
 
         private ISpan GetSpanFromContext()
@@ -87,9 +91,11 @@ namespace OpenTracing.Contrib.Grpc.Handler
         {
             try
             {
-                var tracingRequestStream = new TracingAsyncStreamReader<TRequest>(requestStream, _streamActions);
+                var tracingRequestStream = new TracingAsyncStreamReader<TRequest>(requestStream, _inputStreamActions);
                 var response = await continuation(tracingRequestStream, _context).ConfigureAwait(false);
-                _logger.Response(response);
+                _outputStreamActions.ScopeActions.BeginScope();
+                _outputStreamActions.Message(response);
+                _outputStreamActions.ScopeActions.EndScope();
                 _logger.FinishSuccess();
                 return response;
             }
@@ -104,8 +110,10 @@ namespace OpenTracing.Contrib.Grpc.Handler
         {
             try
             {
-                var tracingResponseStream = new TracingServerStreamWriter<TResponse>(responseStream, _logger.Response);
-                _logger.Request(request);
+                var tracingResponseStream = new TracingServerStreamWriter<TResponse>(responseStream, _outputStreamActions);
+                _inputStreamActions.ScopeActions.BeginScope();
+                _inputStreamActions.Message(request);
+                _inputStreamActions.ScopeActions.EndScope();
                 await continuation(request, tracingResponseStream, _context).ConfigureAwait(false);
                 _logger.FinishSuccess();
             }
@@ -120,8 +128,8 @@ namespace OpenTracing.Contrib.Grpc.Handler
         {
             try
             {
-                var tracingRequestStream = new TracingAsyncStreamReader<TRequest>(requestStream, _streamActions);
-                var tracingResponseStream = new TracingServerStreamWriter<TResponse>(responseStream, _logger.Response);
+                var tracingRequestStream = new TracingAsyncStreamReader<TRequest>(requestStream, _inputStreamActions);
+                var tracingResponseStream = new TracingServerStreamWriter<TResponse>(responseStream, _outputStreamActions);
                 await continuation(tracingRequestStream, tracingResponseStream, _context).ConfigureAwait(false);
                 _logger.FinishSuccess();
             }

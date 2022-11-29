@@ -54,6 +54,7 @@ namespace OpenTracing.Contrib.Grpc.Interceptors
             private IOperationNameConstructor _operationNameConstructor;
             private bool _streaming;
             private bool _streamingInputSpans;
+            private bool _streamingOutputSpans;
             private bool _verbose;
             private ISet<ServerTracingConfiguration.RequestAttribute> _tracedAttributes;
 
@@ -91,6 +92,16 @@ namespace OpenTracing.Contrib.Grpc.Interceptors
             }
 
             /// <summary>
+            /// Creates a child span for each output message sent.
+            /// </summary>
+            /// <returns>this Builder configured to create child spans</returns>
+            public Builder WithStreamingOutputSpans()
+            {
+                _streamingOutputSpans = true;
+                return this;
+            }
+
+            /// <summary>
             /// Logs all request life-cycle events to server spans.
             /// </summary>
             /// <returns>this Builder configured to be verbose</returns>
@@ -110,7 +121,7 @@ namespace OpenTracing.Contrib.Grpc.Interceptors
 
             public ServerTracingInterceptor Build()
             {
-                var configuration = new ServerTracingConfiguration(_tracer, _operationNameConstructor, _streaming, _streamingInputSpans, _verbose, _tracedAttributes);
+                var configuration = new ServerTracingConfiguration(_tracer, _operationNameConstructor, _streaming, _streamingInputSpans, _streamingOutputSpans, _verbose, _tracedAttributes);
                 return new ServerTracingInterceptor(configuration);
             }
         }

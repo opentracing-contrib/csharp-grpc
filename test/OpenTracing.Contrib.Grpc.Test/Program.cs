@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Grpc.Core;
@@ -15,20 +14,38 @@ namespace OpenTracing.Contrib.Grpc.Test
     {
         private class ConsoleMockTracer : MockTracer
         {
+            private volatile object _syncRoot;
+
+            public ConsoleMockTracer(object syncRoot)
+            {
+                _syncRoot = syncRoot;
+            }
+
             protected override void OnSpanFinished(MockSpan span)
             {
-                Console.WriteLine(span);
-                Console.WriteLine("Tags:");
-                Console.WriteLine(string.Join("; ", span.Tags.Select(e => $"{e.Key} = {e.Value}")));
-                Console.WriteLine("Logs:");
-                span.LogEntries.ForEach(entry =>
-                    Console.WriteLine($"Timestamp: {entry.Timestamp}, Fields: "
-                                      + string.Join("; ", entry.Fields.Select(e => $"{e.Key} = {e.Value}"))));
-                Console.WriteLine();
+                lock (_syncRoot)
+                {
+                    Console.WriteLine(span);
+                    Console.WriteLine("Tags:");
+                    Console.WriteLine(string.Join("; ", span.Tags.Select(e => $"{e.Key} = {e.Value}")));
+                    Console.WriteLine("Logs:");
+                    span.LogEntries.ForEach(entry =>
+                        Console.WriteLine($"Timestamp: {entry.Timestamp}, Fields: "
+                                          + string.Join("; ", entry.Fields.Select(e => $"{e.Key} = {e.Value}"))));
+                    Console.WriteLine();
+                }
             }
         }
 
-        private static readonly ServerTracingInterceptor ServerTracingInterceptor = new ServerTracingInterceptor(new ConsoleMockTracer());
+        private static readonly object SyncRoot = new object();
+        private static readonly ServerTracingInterceptor ServerTracingInterceptor = new ServerTracingInterceptor
+            .Builder(new ConsoleMockTracer(SyncRoot))
+            .WithStreaming()
+            .WithStreamingInputSpans()
+            .WithStreamingOutputSpans()
+            .WithVerbosity()
+            .WithTracedAttributes(ServerTracingConfiguration.RequestAttribute.Headers, ServerTracingConfiguration.RequestAttribute.MethodName)
+            .Build();
 
         private static Task Main()
         {
@@ -45,17 +62,21 @@ namespace OpenTracing.Contrib.Grpc.Test
             server.Start();
 
             var tracingInterceptor = new ClientTracingInterceptor
-                .Builder(new ConsoleMockTracer())
+                .Builder(new ConsoleMockTracer(SyncRoot))
                 .WithStreaming()
+                .WithStreamingInputSpans()
+                .WithStreamingOutputSpans()
                 .WithVerbosity()
                 .WithTracedAttributes(ClientTracingConfiguration.RequestAttribute.AllCallOptions, ClientTracingConfiguration.RequestAttribute.Headers)
                 .WithWaitForReady()
                 .Build();
 
+            Console.WriteLine("Calling unary:");
             var client = new Phone.PhoneClient(new Channel("localhost:8011", ChannelCredentials.Insecure).Intercept(tracingInterceptor));
             var request = new Person { Name = "Karl Heinz" };
             var _ = await client.GetNameAsync(request);
 
+            Console.WriteLine("Calling client stream:");
             var response2 = client.GetNameRequestStream();
             await response2.RequestStream.WriteAsync(request);
             await response2.RequestStream.WriteAsync(request);
@@ -63,12 +84,14 @@ namespace OpenTracing.Contrib.Grpc.Test
             await response2.RequestStream.CompleteAsync();
             await response2.ResponseAsync;
 
+            Console.WriteLine("Calling server stream:");
             var response3 = client.GetNameResponseStream(request);
             while (await response3.ResponseStream.MoveNext())
             {
                 // Ignore
             }
 
+            Console.WriteLine("Calling bi-di stream:");
             var response4 = client.GetNameBiDiStream(new Metadata());
             await response4.RequestStream.WriteAsync(request);
             await response4.RequestStream.WriteAsync(request);
@@ -88,6 +111,7 @@ namespace OpenTracing.Contrib.Grpc.Test
                         .WithWaitForReady(true)
                         .WithWriteOptions(new WriteOptions(WriteFlags.NoCompress));
 
+                Console.WriteLine("Calling unary with options:");
                 var response5 = await client.GetNameAsync(
                     new Person { Name = "Test" },
                     options);

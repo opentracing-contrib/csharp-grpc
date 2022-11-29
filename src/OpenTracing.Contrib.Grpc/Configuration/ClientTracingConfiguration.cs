@@ -26,8 +26,8 @@ namespace OpenTracing.Contrib.Grpc.Configuration
             TracedAttributes = new HashSet<RequestAttribute>();
         }
 
-        internal ClientTracingConfiguration(ITracer tracer, IOperationNameConstructor operationNameConstructor, bool streaming, bool streamingInputSpans, bool verbose, ISet<RequestAttribute> tracedAttributes, bool waitForReady, CancellationToken fallbackCancellationToken)
-            : base(tracer, operationNameConstructor, streaming, streamingInputSpans, verbose)
+        internal ClientTracingConfiguration(ITracer tracer, IOperationNameConstructor operationNameConstructor, bool streaming, bool streamingInputSpans, bool streamingOutputSpans, bool verbose, ISet<RequestAttribute> tracedAttributes, bool waitForReady, CancellationToken fallbackCancellationToken)
+            : base(tracer, operationNameConstructor, streaming, streamingInputSpans, streamingOutputSpans, verbose)
         {
             TracedAttributes = tracedAttributes ?? new HashSet<RequestAttribute>();
             WaitForReady = waitForReady;
