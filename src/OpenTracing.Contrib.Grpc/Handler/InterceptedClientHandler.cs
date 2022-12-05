@@ -18,7 +18,8 @@ namespace OpenTracing.Contrib.Grpc.Handler
         private readonly ClientTracingConfiguration _configuration;
         private readonly ClientInterceptorContext<TRequest, TResponse> _context;
         private readonly GrpcTraceLogger<TRequest, TResponse> _logger;
-        private readonly TracingAsyncStreamReader<TResponse>.StreamActions _streamActions;
+        private readonly StreamActions<TResponse> _inputStreamActions;
+        private readonly StreamActions<TRequest> _outputStreamActions;
 
         public InterceptedClientHandler(ClientTracingConfiguration configuration, ClientInterceptorContext<TRequest, TResponse> context)
         {
@@ -35,8 +36,11 @@ namespace OpenTracing.Contrib.Grpc.Handler
             _logger = new GrpcTraceLogger<TRequest, TResponse>(span, configuration);
             _configuration.Tracer.Inject(span.Context, BuiltinFormats.HttpHeaders, new MetadataCarrier(_context.Options.Headers));
 
-            var scopeActions = new ScopeActions("new_response", _logger.BeginScope, _logger.EndScope);
-            _streamActions = new TracingAsyncStreamReader<TResponse>.StreamActions(scopeActions, _logger.Response, _logger.FinishSuccess, _logger.FinishException);
+            var inputScopeActions = new ScopeActions("new_response", _logger.BeginInputScope, _logger.EndInputScope);
+            _inputStreamActions = new StreamActions<TResponse>(inputScopeActions, _logger.Response, _logger.FinishSuccess, _logger.FinishException);
+
+            var outputScopeActions = new ScopeActions("new_request", _logger.BeginOutputScope, _logger.EndOutputScope);
+            _outputStreamActions = new StreamActions<TRequest>(outputScopeActions, _logger.Request);
         }
 
         private CallOptions ApplyConfigToCallOptions(CallOptions callOptions)
@@ -147,7 +151,7 @@ namespace OpenTracing.Contrib.Grpc.Handler
         {
             _logger.Request(request);
             var rspCnt = continuation(request, _context);
-            var tracingResponseStream = new TracingAsyncStreamReader<TResponse>(rspCnt.ResponseStream, _streamActions);
+            var tracingResponseStream = new TracingAsyncStreamReader<TResponse>(rspCnt.ResponseStream, _inputStreamActions);
             var rspHeaderAsync = rspCnt.ResponseHeadersAsync.ContinueWith(LogResponseHeader);
             return new AsyncServerStreamingCall<TResponse>(tracingResponseStream, rspHeaderAsync, rspCnt.GetStatus, rspCnt.GetTrailers, rspCnt.Dispose);
         }
@@ -155,7 +159,7 @@ namespace OpenTracing.Contrib.Grpc.Handler
         public AsyncClientStreamingCall<TRequest, TResponse> AsyncClientStreamingCall(Interceptor.AsyncClientStreamingCallContinuation<TRequest, TResponse> continuation)
         {
             var rspCnt = continuation(_context);
-            var tracingRequestStream = new TracingClientStreamWriter<TRequest>(rspCnt.RequestStream, _logger.Request);
+            var tracingRequestStream = new TracingClientStreamWriter<TRequest>(rspCnt.RequestStream, _outputStreamActions);
             var rspAsync = rspCnt.ResponseAsync.ContinueWith(rspTask =>
             {
                 try
@@ -178,8 +182,8 @@ namespace OpenTracing.Contrib.Grpc.Handler
         public AsyncDuplexStreamingCall<TRequest, TResponse> AsyncDuplexStreamingCall(Interceptor.AsyncDuplexStreamingCallContinuation<TRequest, TResponse> continuation)
         {
             var rspCnt = continuation(_context);
-            var tracingRequestStream = new TracingClientStreamWriter<TRequest>(rspCnt.RequestStream, _logger.Request);
-            var tracingResponseStream = new TracingAsyncStreamReader<TResponse>(rspCnt.ResponseStream, _streamActions);
+            var tracingRequestStream = new TracingClientStreamWriter<TRequest>(rspCnt.RequestStream, _outputStreamActions);
+            var tracingResponseStream = new TracingAsyncStreamReader<TResponse>(rspCnt.ResponseStream, _inputStreamActions);
             var rspHeaderAsync = rspCnt.ResponseHeadersAsync.ContinueWith(LogResponseHeader);
             return new AsyncDuplexStreamingCall<TRequest, TResponse>(tracingRequestStream, tracingResponseStream, rspHeaderAsync, rspCnt.GetStatus, rspCnt.GetTrailers, rspCnt.Dispose);
         }

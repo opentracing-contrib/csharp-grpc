@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Grpc.Core;
 
 namespace OpenTracing.Contrib.Grpc.Streaming
@@ -7,12 +6,12 @@ namespace OpenTracing.Contrib.Grpc.Streaming
     internal class TracingServerStreamWriter<T> : IServerStreamWriter<T>
     {
         private readonly IServerStreamWriter<T> _writer;
-        private readonly Action<T> _onWrite;
+        private readonly StreamActions<T> _streamActions;
 
-        public TracingServerStreamWriter(IServerStreamWriter<T> writer, Action<T> onWrite)
+        public TracingServerStreamWriter(IServerStreamWriter<T> writer, StreamActions<T> streamActions)
         {
             _writer = writer;
-            _onWrite = onWrite;
+            _streamActions = streamActions;
         }
 
         public WriteOptions WriteOptions
@@ -23,7 +22,10 @@ namespace OpenTracing.Contrib.Grpc.Streaming
 
         public Task WriteAsync(T message)
         {
-            _onWrite(message);
+            _streamActions.ScopeActions.EndScope();
+            _streamActions.ScopeActions.BeginScope();
+            _streamActions.Message(message);
+
             return _writer.WriteAsync(message);
         }
     }

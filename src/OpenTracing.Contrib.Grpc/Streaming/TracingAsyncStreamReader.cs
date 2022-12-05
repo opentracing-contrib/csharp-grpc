@@ -5,14 +5,14 @@ using Grpc.Core;
 
 namespace OpenTracing.Contrib.Grpc.Streaming
 {
-    internal partial class TracingAsyncStreamReader<T> : IAsyncStreamReader<T>
+    internal class TracingAsyncStreamReader<T> : IAsyncStreamReader<T>
     {
         private readonly IAsyncStreamReader<T> _reader;
-        private readonly StreamActions _streamActions;
+        private readonly StreamActions<T> _streamActions;
 
         public T Current => _reader.Current;
 
-        public TracingAsyncStreamReader(IAsyncStreamReader<T> reader, StreamActions streamActions)
+        public TracingAsyncStreamReader(IAsyncStreamReader<T> reader, StreamActions<T> streamActions)
         {
             _reader = reader;
             _streamActions = streamActions;
