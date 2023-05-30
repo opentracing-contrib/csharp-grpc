@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using Grpc.Core;
 using Grpc.Core.Interceptors;
@@ -45,10 +46,19 @@ namespace OpenTracing.Contrib.Grpc.Handler
 
         private CallOptions ApplyConfigToCallOptions(CallOptions callOptions)
         {
-            if (callOptions.Headers == null)
+            var headers = callOptions.Headers;
+            if (headers == null || headers.IsReadOnly)
             {
-                // Add empty metadata to options:
-                callOptions = callOptions.WithHeaders(new Metadata());
+                // Use empty, writable metadata as base:
+                var metadata = new Metadata();
+
+                // Copy elements since it was read-only if it had elements:
+                foreach (var header in headers ?? Enumerable.Empty<Metadata.Entry>())
+                {
+                    metadata.Add(header);
+                }
+
+                callOptions = callOptions.WithHeaders(metadata);
             }
 
             if (_configuration.WaitForReady && callOptions.IsWaitForReady != _configuration.WaitForReady)
