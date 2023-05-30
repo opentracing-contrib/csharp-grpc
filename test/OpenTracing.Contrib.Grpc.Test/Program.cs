@@ -38,8 +38,9 @@ namespace OpenTracing.Contrib.Grpc.Test
         }
 
         private static readonly object SyncRoot = new object();
+        private static readonly ConsoleMockTracer ServerTracer = new ConsoleMockTracer(SyncRoot);
         private static readonly ServerTracingInterceptor ServerTracingInterceptor = new ServerTracingInterceptor
-            .Builder(new ConsoleMockTracer(SyncRoot))
+            .Builder(ServerTracer)
             .WithStreaming()
             .WithStreamingInputSpans()
             .WithStreamingOutputSpans()
@@ -61,8 +62,9 @@ namespace OpenTracing.Contrib.Grpc.Test
             };
             server.Start();
 
+            var clientTracer = new ConsoleMockTracer(SyncRoot);
             var tracingInterceptor = new ClientTracingInterceptor
-                .Builder(new ConsoleMockTracer(SyncRoot))
+                .Builder(clientTracer)
                 .WithStreaming()
                 .WithStreamingInputSpans()
                 .WithStreamingOutputSpans()
@@ -92,7 +94,7 @@ namespace OpenTracing.Contrib.Grpc.Test
             }
 
             Console.WriteLine("Calling bi-di stream:");
-            var response4 = client.GetNameBiDiStream(new Metadata());
+            var response4 = client.GetNameBiDiStream();
             await response4.RequestStream.WriteAsync(request);
             await response4.RequestStream.WriteAsync(request);
             await response4.RequestStream.WriteAsync(request);
@@ -162,14 +164,29 @@ namespace OpenTracing.Contrib.Grpc.Test
 
             public override async Task GetNameBiDiStream(IAsyncStreamReader<Person> requestStream, IServerStreamWriter<Person> responseStream, ServerCallContext context)
             {
+                var tracingInterceptor = new ClientTracingInterceptor
+                        .Builder(ServerTracer)
+                    .WithStreaming()
+                    .WithStreamingInputSpans()
+                    .WithStreamingOutputSpans()
+                    .WithVerbosity()
+                    .WithTracedAttributes(ClientTracingConfiguration.RequestAttribute.AllCallOptions, ClientTracingConfiguration.RequestAttribute.Headers)
+                    .WithWaitForReady()
+                    .Build();
+                var channel = new Channel("localhost:8011", ChannelCredentials.Insecure);
+                var client = new Phone.PhoneClient(channel.Intercept(tracingInterceptor));
+
                 while (await requestStream.MoveNext())
                 {
                     var request = requestStream.Current;
                     if (string.IsNullOrEmpty(request.Name))
                         throw new RpcException(new Status(StatusCode.InvalidArgument, "name must not be empty"));
 
-                    await responseStream.WriteAsync(request);
+                    var response = await client.GetNameAsync(request, context.RequestHeaders, context.Deadline, context.CancellationToken);
+                    await responseStream.WriteAsync(response);
                 }
+
+                await channel.ShutdownAsync();
             }
         }
     }
