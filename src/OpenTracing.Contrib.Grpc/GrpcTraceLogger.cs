@@ -35,7 +35,7 @@ namespace OpenTracing.Contrib.Grpc
             _span.Log(new Dictionary<string, object>
             {
                 { LogFields.Event, "Response headers received" },
-                { "data", metadata }
+                { "data", metadata?.ToReadableString() }
             });
         }
 
