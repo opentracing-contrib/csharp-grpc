@@ -16,6 +16,15 @@ namespace OpenTracing.Contrib.Grpc.Propagation
 
         public void Set(string key, string value)
         {
+            // We remove all the existing values for that key before adding the new one to have a "set" behavior:
+            for (var i = _metadata.Count - 1; i >= 0; i--)
+            {
+                if (_metadata[i].Key == key)
+                {
+                    _metadata.RemoveAt(i);
+                }
+            }
+
             _metadata.Add(key, value);
         }
 
