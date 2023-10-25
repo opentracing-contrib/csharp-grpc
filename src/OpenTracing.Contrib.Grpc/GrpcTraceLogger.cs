@@ -15,7 +15,16 @@ namespace OpenTracing.Contrib.Grpc
         private IScope _scope;
         private bool _isFinished;
 
-        private ISpan ScopeSpan => _scope?.Span ?? _span;
+        private ISpan ScopeSpan
+        {
+            get
+            {
+                lock (this)
+                {
+                    return _scope?.Span ?? _span;
+                }
+            }
+        }
 
         public GrpcTraceLogger(ISpan span, TracingConfiguration configuration)
         {
@@ -55,11 +64,14 @@ namespace OpenTracing.Contrib.Grpc
 
         private void BeginScope(string operationName)
         {
-            if (_scope != null) EndScope();
+            lock (this)
+            {
+                if (_scope != null) EndScope();
 
-            _scope = _configuration.Tracer.BuildSpan(operationName)
-                .AsChildOf(_span.Context)
-                .StartActive(false);
+                _scope = _configuration.Tracer.BuildSpan(operationName)
+                    .AsChildOf(_span.Context)
+                    .StartActive(false);
+            }
         }
 
         public void EndInputScope()
@@ -78,11 +90,14 @@ namespace OpenTracing.Contrib.Grpc
 
         private void EndScope()
         {
-            if (_scope == null) return;
+            lock (this)
+            {
+                if (_scope == null) return;
 
-            _scope.Span.Finish();
-            _scope.Dispose();
-            _scope = null;
+                _scope.Span.Finish();
+                _scope.Dispose();
+                _scope = null;
+            }
         }
 
         public void Request(TRequest req)
